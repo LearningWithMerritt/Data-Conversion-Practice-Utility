@@ -32,7 +32,7 @@ def show_hashes():
     files = os.listdir(PROJECT_ROOT / "assignments")
 
     for file in files:
-        print(f"{file}: {get_hash(PROJECT_ROOT / "assignments" / file)}")
+        print(f"{file}: {get_hash(PROJECT_ROOT / 'assignments' / file)}")
 
 
 def check_hash():
