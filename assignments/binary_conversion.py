@@ -61,6 +61,10 @@ def create_question():
           "Your answer should be a binary number containing only 0s and 1s no longer than a byte (8bits), with no extra spaces"
         )
         answer = input(f"{question}" + question_directions)
+
+        if(answer.lower().strip() == "exit"):
+          return
+        
         match = re.search(pattern, answer)
 
       all_zero_pattern = r"0+"
@@ -99,6 +103,8 @@ def create_question():
           "Your answer should be a decimal number containing only digits 0-9 between the values of 0-1000, with no extra spaces"
         )
         answer = input(f"{question}" + question_directions)
+        if(answer.lower().strip() == "exit"):
+          return
         match = re.search(pattern, answer)
 
       all_zero_pattern = r"0+"

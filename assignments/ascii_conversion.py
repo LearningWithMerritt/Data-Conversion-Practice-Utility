@@ -66,6 +66,8 @@ def create_question():
           os.system('cls' if os.name == 'nt' else 'clear')
           print("Your answer should be a single character, with no extra spaces")
           answer = input(f"{question}"+ question_directions)
+          if(answer.lower().strip() == "exit"):
+            return
           match = re.search(pattern,answer)
     
       if answer == ascii_char:
@@ -94,6 +96,8 @@ def create_question():
         os.system('cls' if os.name == 'nt' else 'clear')
         print("Your answer should be a binary number containing only 0s and 1s, with no extra spaces")
         answer = input(f"{question}"+ question_directions)
+        if(answer.lower().strip() == "exit"):
+          return
         match = re.search(pattern,answer)
 
       all_zero_pattern = r"0+"
@@ -130,6 +134,8 @@ def create_question():
           os.system('cls' if os.name == 'nt' else 'clear')
           print("Your answer should be a single character, with no extra spaces")
           answer = input(f"{question}"+ question_directions)
+          if(answer.lower().strip() == "exit"):
+            return
           match = re.search(pattern,answer)
     
       if answer == ascii_char:

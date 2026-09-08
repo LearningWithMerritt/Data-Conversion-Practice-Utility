@@ -66,8 +66,6 @@ def start_menu(args):
         except ValueError as e:
             print("Please enter a valid number 1-6.\n")
 
-
-
 def report_menu():
     files = os.listdir(REPORT_PATH)
 

@@ -56,6 +56,8 @@ def create_question():
           "Your answer should be a hexadecimal number containing digits 0-9 A-F between 00 and FF, with no extra spaces"
         )
         answer = input(f"{question}" + question_directions)
+        if(answer.lower().strip() == "exit"):
+          return
         match = re.search(pattern, answer)
       
       answer = answer.upper()
@@ -101,6 +103,8 @@ def create_question():
           "Your answer should be a decimal number containing only digits 0-9 between the values of 0-1000, with no extra spaces"
         )
         answer = input(f"{question}" + question_directions)
+        if(answer.lower().strip() == "exit"):
+          return
         match = re.search(pattern, answer)
 
       all_zero_pattern = r"0+"
