@@ -332,7 +332,7 @@ class Quiz:
             unicode = "\u2757"
 
         header = (
-            f"[ USER: {self.uname} | ELAPSED TIME: {timedelta(seconds = int(self.t_elapsed))} |" +
+            f"[ USER: {self.uname} | QUIZ: {self.qtype} | ELAPSED TIME: {timedelta(seconds = int(self.t_elapsed))} |" +
             f" TOTAL CORRECT: {self.ncorrect}/{self.nquestions} {unicode} | PERCENT CORRECT: {percent}% {unicode} ]"
         )
 
