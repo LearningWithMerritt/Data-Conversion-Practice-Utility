@@ -26,6 +26,12 @@ def pad(string,desired_length,front=False):
         padded_string = string
     return padded_string
 
+def log(data):
+    with open(LOGFILE,"a") as f:
+            f.write(f"{datetime.now()} : [ {data} ] \n")
+
+
+
 class Menu:
     
     def __init__(self, prompt, options):
@@ -145,39 +151,46 @@ class Quiz:
         
     def load(self):
         try: 
-            # with open(SAVEFILE, "r") as file:
-            #     data = json.load(file)
 
             with open("json.save", "rb") as f:
                 encoded = f.read()
             
             data = json.loads(base64.b64decode(encoded).decode("utf-8"))
 
-            self.uname = data.get(f"{self.qtype}_save").get("uname")
-            self.t_elapsed = self.t_previous = data.get(f"{self.qtype}_save").get("t_elapsed")
-            self.ncorrect = data.get(f"{self.qtype}_save").get("ncorrect")
-            self.history = data.get(f"{self.qtype}_save").get("history")
 
-            for key in self.history.keys():
-                if key in self.bank:
-                    self.bank.pop(key)
+            if(f"{self.qtype}_save" in data.keys()):
+                self.uname = data.get(f"{self.qtype}_save").get("uname")
+                self.t_elapsed = self.t_previous = data.get(f"{self.qtype}_save").get("t_elapsed")
+                self.ncorrect = data.get(f"{self.qtype}_save").get("ncorrect")
+                self.history = data.get(f"{self.qtype}_save").get("history")
 
-            print(f"{datetime.now()} : [ PREVIOUS RESPONSES FOUND AND LOADED ]\n")
-            time.sleep(1)
+                for key in self.history.keys():
+                    if key in self.bank:
+                        self.bank.pop(key)
 
-            self.t0 = time.time()
-            self.loaded = True
+                print(f"{datetime.now()} : [ PREVIOUS RESPONSES FOUND AND LOADED ]\n")
+                time.sleep(1)
+
+                self.t0 = time.time()
+                self.loaded = True
+            else:
+                self.save()
 
         except FileNotFoundError as e:
+            log("No previous save file found")
             print(f"{datetime.now()} : [ No previous save file found. ]")
             # with open(SAVEFILE, "w"):
             #     pass
 
             with open("json.save","w"):
                 pass
-            
-            raise
+
+            self.save()
+
+            log("json.save file created successfully")
+        
         except json.JSONDecodeError as e:
+            log(str(e))
             self.save()
             return
 
@@ -185,18 +198,20 @@ class Quiz:
             raise
 
         except Exception as e:
+            log(f"Unable to load save data --> {e}")
             print(f"{datetime.now()} : [ Unable to load save data. ]")
-            # traceback.print_exc() --> Log
+
             raise
 
     def save(self):
         try:
+            if self.uname == "":
+                self.get_uname()
             self.t_elapsed = (time.time() - self.t0) + self.t_previous
 
-            try:
-                with open("json.save", "rb") as f:
+            with open("json.save", "rb") as f:
                     encoded = f.read()
-            
+            try:
                 data = json.loads(base64.b64decode(encoded).decode("utf-8"))
 
             except json.decoder.JSONDecodeError as e:
@@ -218,10 +233,15 @@ class Quiz:
 
         except KeyboardInterrupt:
             raise
-            
+
+        except FileNotFoundError:
+            log(f"{SAVEFILE} not found while attempting to save.")
+            with open("json.save", "w") as f:
+                pass
+
         except Exception as e:
+            log(f"An error occured while saving answers. --> {e}")
             print(f"[ An error occured while saving answers. ]\n{e}")
-            wait()
     
     def run(self):
 
@@ -302,6 +322,7 @@ class Quiz:
     def report(self):
         if not self.loaded:
             self.load()
+
 
         percent = self.ncorrect / self.nquestions * 100
 
