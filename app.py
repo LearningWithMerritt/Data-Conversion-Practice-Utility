@@ -296,7 +296,13 @@ class Quiz:
         
             hudbar = (f"[ USER: {self.uname} | QUIZ: {self.qtype} | # CORRECT: {self.ncorrect} | QUESTION #: {len(self.history)+1}/{self.nquestions} ]")
 
-            qprompt = f"[ {len(self.history)+1}.) Convert {convert_from} '{qdata.get(convert_from)}' to {convert_to} ]:\n"
+
+            value = qdata.get(convert_from)
+
+            if convert_from == "hexadecimal":
+                value = qdata.get(convert_from).upper()
+                
+            qprompt = f"[ {len(self.history)+1}.) Convert {convert_from} '{value}' to {convert_to} ]:\n"
 
             qanswer = qdata.get(convert_to)
             
@@ -381,40 +387,42 @@ class Question:
     def userin(self):
         clear()
 
-        print(self.hud)
-        self.user_response = input(self.prompt).lower().strip()
-
-        # handle all zero pattern --> r"0+"
-        if re.fullmatch(r"0+", self.user_response):
-            self.user_response = "0"
-        else:
-            self.user_response.lstrip("0")
-
-
-        if self.answer_type in ["decimal", "binary", "hexadecimal"]:
-            # self.answer = self.answer.lstrip("0")
-            if self.user_response[:2] in ["0x","0b","0h","&H"]:
-                self.user_response = self.user_response[2:]
-            elif self.user_response[:1] in ["#","$"]:
-                self.user_response = self.user_response[1:]
-            self.user_response = self.user_response.lstrip("0")
-
-        match = re.fullmatch(self.pattern, self.user_response)
+        match = False
         while not match:
-            clear()
-            print(self.invalid_response)
-            input("[ Press [ENTER] to continue... ]")
-            clear()
 
             print(self.hud)
-            self.user_response = input(self.prompt).lower().strip()
 
+            if(self.answer_type == "character"):
+                self.user_response = input(self.prompt)
+            else:
+                self.user_response = input(self.prompt).lower()
+            
+            if re.fullmatch(r" +", self.user_response):
+                self.user_response = " "
+            else:
+                self.user_response.strip()
+
+        
+            if self.answer_type in ["decimal", "binary", "hexadecimal"]:
+                # self.answer = self.answer.lstrip("0")
+                if len(self.user_response) > 1 and self.user_response[:2] in ["0x","0b","0h","&H"]:
+                    self.user_response = self.user_response[2:]
+                elif self.user_response[:1] in ["#","$"]:
+                    self.user_response = self.user_response[1:]
+                
             if re.fullmatch(r"0+", self.user_response):
                 self.user_response = "0"
             else:
                 self.user_response.lstrip("0")
 
+
             match = re.fullmatch(self.pattern, self.user_response)
+
+            if not match:
+                clear()
+                print(self.invalid_response)
+                input("[ Press [ENTER] to continue... ]")
+                clear()
 
         return self.user_response
 
