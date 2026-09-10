@@ -200,8 +200,9 @@ class Quiz:
         except Exception as e:
             log(f"Unable to load save data --> {e}")
             print(f"{datetime.now()} : [ Unable to load save data. ]")
+            self.save()
 
-            raise
+  
 
     def save(self):
         try:
@@ -249,13 +250,11 @@ class Quiz:
             self.save()
             self.loaded = False
         else:
-            try:
-                self.load()
-                if (len(self.history) >= self.nquestions):
-                    self.report()
-                    return
-            except:
-                pass
+            self.load()
+            if (len(self.history) >= self.nquestions):
+                self.report()
+                return
+
 
         if self.uname == "":
             self.get_uname()
@@ -394,8 +393,10 @@ class Question:
 
         if self.answer_type in ["decimal", "binary", "hexadecimal"]:
             # self.answer = self.answer.lstrip("0")
-            if self.user_response[:2] in ["0x","0b"]:
+            if self.user_response[:2] in ["0x","0b","0h","&H"]:
                 self.user_response = self.user_response[2:]
+            elif self.user_response[:1] in ["#","$"]:
+                self.user_response = self.user_response[1:]
             self.user_response = self.user_response.lstrip("0")
 
         match = re.fullmatch(self.pattern, self.user_response)
