@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 OLD/
 
+json.save
 dev.log
 
 reports/

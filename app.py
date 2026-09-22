@@ -30,6 +30,10 @@ def log(data):
     with open(LOGFILE,"a") as f:
             f.write(f"{datetime.now()} : [ {data} ] \n")
 
+def confirm():
+    clear()
+    return "y" == input(f"[ Are you sure? (y/n) ]\n{PROMPT_INDICATOR}").strip().lower()
+        
 
 
 class Menu:
@@ -86,18 +90,21 @@ class Quiz:
         if "binary" == self.qtype:
             self.options = ("decimal", "binary")
             for decimal in range(256):
-                binary = str(bin(decimal)[2:]).lstrip("0")
+                binary = str(bin(decimal)[2:])
 
-                # if len(binary) < 8:
-                #     nspaces = 8 - len(binary)
-                #     binary = ("0" * nspaces) + binary
+                if not re.fullmatch(r"0+", binary):
+                    binary = binary.lstrip("0")
                 
                 self.bank[str(decimal)] = binary
         
         elif "hexadecimal" == self.qtype:
             self.options = ("decimal","hexadecimal")
             for decimal in range(256):
-                hexadecimal = str(hex(decimal)[2:]).lstrip("0")
+                hexadecimal = str(hex(decimal)[2:])
+
+                if not re.fullmatch(r"0+", hexadecimal):
+                    hexadecimal = hexadecimal.lstrip("0")
+
                 self.bank[str(decimal)] = hexadecimal
         
         elif "ascii" == self.qtype:
@@ -105,9 +112,15 @@ class Quiz:
             # char to dec, char to bin, char to hex
             self.options = ("decimal", "binary", "hexadecimal", "character")
             for decimal in range(32,127):
-                binary = str(bin(decimal)[2:]).lstrip("0")
-                hexadecimal = str(hex(decimal)[2:]).lstrip("0")
+                binary = str(bin(decimal)[2:])
+                hexadecimal = str(hex(decimal)[2:])
                 character = chr(decimal)
+
+                if not re.fullmatch(r"0+", binary):
+                    binary = binary.lstrip("0")
+
+                if not re.fullmatch(r"0+", hexadecimal):
+                    hexadecimal = hexadecimal.lstrip("0")
 
                 self.bank[str(decimal)] = (binary,hexadecimal,character)
         
@@ -202,8 +215,6 @@ class Quiz:
             print(f"{datetime.now()} : [ Unable to load save data. ]")
             self.save()
 
-  
-
     def save(self):
         try:
             if self.uname == "":
@@ -272,6 +283,7 @@ class Quiz:
 
         while len(self.history) < self.nquestions:
             key = random.choice(list(self.bank.keys()))
+
 
             qdata = {
                 "decimal" : key
@@ -413,7 +425,7 @@ class Question:
             if re.fullmatch(r"0+", self.user_response):
                 self.user_response = "0"
             else:
-                self.user_response.lstrip("0")
+                self.user_response = self.user_response.lstrip("0")
 
 
             match = re.fullmatch(self.pattern, self.user_response)
@@ -490,11 +502,12 @@ class App:
                         self.menu_stack.pop()
 
                 case "load":
-                        Quiz(current,25).run()
+                    Quiz(current,25).run()
                 case "new":
+                    if confirm():
                         Quiz(current,25,True).run()
                 case "report":
-                        Quiz(current,25).report()
+                    Quiz(current,25).report()
                 case _ :
                     if choice in self.menus.keys():
                         self.menu_stack.append(choice)
@@ -529,7 +542,8 @@ class App:
             "binary" : quiz_menu,
             "hexadecimal" : quiz_menu,
             "ascii" : quiz_menu
-        }       
+        }  
+     
 
 
    
